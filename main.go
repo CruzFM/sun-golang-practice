@@ -4,16 +4,14 @@ package main
 
 import (
 	//"encoding/json" //for JSON decoding
+	"encoding/json"
 	"fmt" // for output
+	"io"
+	"net/http" // for HTTP requests
+	"os"       // for command-line arguments
 	//"io"  // for IO functions
-	//"net/http" // for HTTP requests
-	//"os" // for command-line arguments
 	//"github.com/faith/color" //for color to output
 )
-
-func main() {
-	fmt.Println("Hello boy")
-}
 
 //Define weather struct
 //each field will be tagged with their corresponding JSON proprety
@@ -41,4 +39,42 @@ type Weather struct {
 			} `json:"hour"`
 		} `json:"forecastday"`
 	} `json:"forecast"`
+}
+
+func main() {
+
+	fmt.Println("Hello boy")
+
+	// we define the default location "Iasi"
+	// This is in case no command-line arguments are provided
+
+	q := "Iasi"
+
+	if len(os.Args) >= 2 {
+		q = os.Args[1]
+	}
+
+	//call to the weather API
+
+	res, err := http.Get("http://api.weatherapi.com/v1/forecast.json?key=fc628bc193e3475bb77152244231609&q=" + q + "&days=1&aqi=no&alerts=no")
+
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		panic("Weather API not available")
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	var weather Weather
+	err = json.Unmarshal(body, &weather)
+	if err != nil {
+		panic(err)
+	}
 }
