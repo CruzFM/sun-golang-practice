@@ -3,14 +3,14 @@ package main
 //we import the required packages.
 
 import (
-	//"encoding/json" //for JSON decoding
-	"encoding/json"
-	"fmt" // for output
+	"encoding/json" //for JSON decoding
+	"fmt"           // for output
 	"io"
 	"net/http" // for HTTP requests
 	"os"       // for command-line arguments
+	"time"
 	//"io"  // for IO functions
-	//"github.com/faith/color" //for color to output
+	// "github.com/faith/color" //for color to output
 )
 
 //Define weather struct
@@ -43,8 +43,6 @@ type Weather struct {
 
 func main() {
 
-	fmt.Println("Hello boy")
-
 	// we define the default location "Iasi"
 	// This is in case no command-line arguments are provided
 
@@ -76,5 +74,35 @@ func main() {
 	err = json.Unmarshal(body, &weather)
 	if err != nil {
 		panic(err)
+	}
+
+	//Output weather Data
+
+	//Extract the relevant data and output the current weather conditions
+
+	location, current, hours := weather.Location, weather.Current, weather.Forecast.Forecastady[0].Hour
+
+	fmt.Printf("%s, %s, %.0fC, %s\n", location.Name, location.Country, current.TempC, current.Condition.Text)
+
+	//loop through the hours slice and print the forecast to the console.
+
+	//time.Unix() helps us compare the time returned from the API to a date we can compare with the current time (time.Now() )
+
+	//If chances of rain are more than 40%, we print the output in red
+
+	for _, hour := range hours {
+		// date := time.Unix(hour.TimeEpoch, 0)
+		date := time.Unix(hour.TimeEpoch, 0)
+		if date.Before(time.Now()) {
+			continue
+		}
+		message := fmt.Sprintf("%s - %.0fC, %0f%%, %s\n", date.Format("15:04"), hour.TempC, hour.ChanceOfRain, hour.Condition.Text)
+
+		if hour.ChanceOfRain < 40 {
+			fmt.Print(message)
+		} else {
+			// color.Red(message)
+			fmt.Print("[(this should be a message)" + message)
+		}
 	}
 }
