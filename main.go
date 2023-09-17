@@ -9,8 +9,9 @@ import (
 	"net/http" // for HTTP requests
 	"os"       // for command-line arguments
 	"time"
+
 	//"io"  // for IO functions
-	// "github.com/faith/color" //for color to output
+	"github.com/fatih/color" //for color to output
 )
 
 //Define weather struct
@@ -101,8 +102,7 @@ func main() {
 		if hour.ChanceOfRain < 40 {
 			fmt.Print(message)
 		} else {
-			// color.Red(message)
-			fmt.Print("[(this should be a message)" + message)
+			color.Red(message)
 		}
 	}
 }
